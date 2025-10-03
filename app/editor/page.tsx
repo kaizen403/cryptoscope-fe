@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import CodeViewer from "../../components/CodeViewer";
 import React from "react";
@@ -515,5 +515,9 @@ function EditorContentPage() {
 }
 
 export default function EditorPage() {
-  return <EditorContentPage />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditorContentPage />
+    </Suspense>
+  );
 }

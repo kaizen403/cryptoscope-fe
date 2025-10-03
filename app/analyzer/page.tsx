@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef, Suspense } from "react";
 // Auth removed
 import CodeViewer from "../../components/CodeViewer";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
@@ -932,7 +932,11 @@ function AnalyzerPageInner() {
 }
 
 export default function AnalyzerPage() {
-  return <AnalyzerPageInner />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AnalyzerPageInner />
+    </Suspense>
+  );
 }
 
 function Primitives({ versionId, path }: { versionId: string; path: string }) {
