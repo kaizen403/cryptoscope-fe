@@ -80,13 +80,13 @@ function EditorContent({ selectedPath, files, versionId, repoId }: { selectedPat
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [highlights, setHighlights] = useState<{ startLine: number; endLine?: number; severity?: string; message?: string }[]>([]);
   const [ext, setExt] = useState<string | undefined>(undefined);
+  
   const entry = files.find(f => f.analysis.file_path === selectedPath);
-  if (!entry) return <div className="empty-state">No analysis available for {selectedPath}.</div>;
-  const a = entry.analysis;
+  const a = entry?.analysis;
   useEffect(() => {
-    const e = (selectedPath.match(/\.[a-z0-9]+$/i)?.[0] || a.file_extension || '').toLowerCase();
+    const e = (selectedPath.match(/\.[a-z0-9]+$/i)?.[0] || a?.file_extension || '').toLowerCase();
     setExt(e.startsWith('.') ? e : (e ? `.${e}` : undefined));
-  }, [selectedPath, a.file_extension]);
+  }, [selectedPath, a?.file_extension]);
 
   useEffect(() => {
     let cancelled = false;
@@ -126,6 +126,10 @@ function EditorContent({ selectedPath, files, versionId, repoId }: { selectedPat
     load();
     return () => { cancelled = true; };
   }, [selectedPath, versionId, repoId]);
+  
+  // Early return after all hooks
+  if (!entry) return <div className="empty-state">No analysis available for {selectedPath}.</div>;
+  
   if (fileContent) {
     return (
       <div>
@@ -133,7 +137,7 @@ function EditorContent({ selectedPath, files, versionId, repoId }: { selectedPat
       </div>
     );
   }
-  if (a.code_snippets?.length) {
+  if (a?.code_snippets?.length) {
     const hl = (a.crypto_functions || []).map((fn) => ({ startLine: Number(fn.line_start || 0) || 1, severity: 'info', message: fn.type || fn.name || 'crypto usage' }));
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -275,7 +279,7 @@ function AnalyzerPageInner() {
       setExpanded(defaults);
       logMsg(`loaded ${entries.length} directory entries`);
     } catch {}
-  }, []);
+  }, [logMsg]);
 
   const onAnalyzeLocal = async () => {
     if (!directoryPath.trim()) return;
